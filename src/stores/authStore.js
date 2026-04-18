@@ -11,7 +11,7 @@ export const useAuth = create((set)=>({
             //set loading true and error null
             set({loading:true,error:null})
             //make api call
-            let res = await axios.get("http://localhost:3000/common-api/check-auth",{withCredentials:true})
+            let res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/common-api/check-auth`,{withCredentials:true})
             res=res.data
             // console.log(res)
             set({
@@ -37,7 +37,7 @@ export const useAuth = create((set)=>({
             //set loading true and error null
             set({loading:true,error:null})
             //make api call
-            let res = await axios.post("http://localhost:3000/common-api/login",userCredObj,{withCredentials:true})
+            let res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/common-api/login`,userCredObj,{withCredentials:true})
             res=res.data
             // console.log(res)
             //update state
@@ -61,7 +61,7 @@ export const useAuth = create((set)=>({
     logout :async ()=>{
       try {
         set({loading:true,error:null})
-        let res =await axios.get("http://localhost:3000/common-api/logout",{withCredentials:true})
+        let res =await axios.get(`${import.meta.env.VITE_API_BASE_URL}/common-api/logout`,{withCredentials:true})
         res=res.data
         // console.log(res)
         set({
@@ -102,7 +102,7 @@ export const useAuth = create((set)=>({
 //           set({ loading: true, error: null })
 
 //           let res = await axios.post(
-//             "http://localhost:3000/common-api/login",
+//             `${import.meta.env.VITE_API_BASE_URL}/common-api/login`,
 //             userCredObj,
 //             { withCredentials: true }
 //           )
@@ -127,7 +127,7 @@ export const useAuth = create((set)=>({
 //           set({ loading: true, error: null })
 
 //           await axios.get(
-//             "http://localhost:3000/common-api/logout",
+//             `${import.meta.env.VITE_API_BASE_URL}/common-api/logout`,
 //             { withCredentials: true }
 //           )
 

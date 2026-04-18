@@ -27,7 +27,7 @@ function ArticleById() {
     async function fetchArticle() {
       try {
         const res = await axios.get(
-          `http://localhost:3000/common-api/articles/${id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/common-api/articles/${id}`,
           { withCredentials: true }
         );
         setArticle(res.data.payload);
@@ -46,7 +46,7 @@ function ArticleById() {
     setCommentLoading(true);
     try {
       const res = await axios.put(
-        "http://localhost:3000/user-api/articles",
+        `${import.meta.env.VITE_API_BASE_URL}/user-api/articles`,
         {
           articleId: id,
           user: currentUser._id,

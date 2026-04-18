@@ -22,7 +22,7 @@ function UserDashboard() {
       try {
 
         const res = await axios.get(
-          "http://localhost:3000/user-api/articles",
+          `${import.meta.env.VITE_API_BASE_URL}/user-api/articles`,
           { withCredentials: true }
         );
 

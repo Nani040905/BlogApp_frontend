@@ -26,7 +26,7 @@ export default function EditArticle() {
     const fetchArticle = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/common-api/articles/${id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/common-api/articles/${id}`,
           { withCredentials: true }
         );
         const article = res.data.payload;
@@ -58,7 +58,7 @@ export default function EditArticle() {
       };
 
       await axios.put(
-        "http://localhost:3000/author-api/articles",
+        `${import.meta.env.VITE_API_BASE_URL}/author-api/articles`,
         updateObj,
         { withCredentials: true }
       );

@@ -16,7 +16,7 @@ function AuthorDashboard() {
     setLoading(true)
     async function getData(){
       try {
-        let res = await axios.get(`http://localhost:3000/author-api/articles/${currentUser._id}`,{withCredentials:true})
+        let res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/author-api/articles/${currentUser._id}`,{withCredentials:true})
         let articleObj=res.data.payload
         setArticles([...articleObj])
       } catch (err) {
@@ -37,7 +37,7 @@ function AuthorDashboard() {
   const deleteArticle = async (articleId) => {
     try {
       const res = await axios.delete(
-        `http://localhost:3000/author-api/articles/authorId/${currentUser._id}/articleId/${articleId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/author-api/articles/authorId/${currentUser._id}/articleId/${articleId}`,
         { withCredentials: true }
       );
       toast.success("Article deleted (soft)!");
@@ -50,7 +50,7 @@ function AuthorDashboard() {
   const restoreArticle = async (articleId) => {
     try {
       const res = await axios.patch(
-        `http://localhost:3000/author-api/articles/authorId/${currentUser._id}/articleId/${articleId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/author-api/articles/authorId/${currentUser._id}/articleId/${articleId}`,
         {},
         { withCredentials: true }
       );

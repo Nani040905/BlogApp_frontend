@@ -29,7 +29,7 @@ export default function Register() {
     try {
       if (role === "USER"){
         // make request to user-api
-        let resObj = await axios.post("http://localhost:3000/user-api/users",formData)
+        let resObj = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user-api/users`,formData)
         let res = resObj.data;
         navigate('/login')
       }
@@ -37,7 +37,7 @@ export default function Register() {
         // make request to author-api
         let {role,...userObj} = newUser;
         // make request to user-api
-        let resObj = await axios.post("http://localhost:3000/author-api/users",formData)
+        let resObj = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/author-api/users`,formData)
         let res = resObj.data;
         navigate('/login')
       }

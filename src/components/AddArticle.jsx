@@ -25,7 +25,7 @@ export default function AddArticle() {
       // Attach author ID from the logged-in user
       const articleObj = { ...data, author: currentUser._id };
       let res = await axios.post(
-        "http://localhost:3000/author-api/articles",
+        `${import.meta.env.VITE_API_BASE_URL}/author-api/articles`,
         articleObj,
         { withCredentials: true }
       );

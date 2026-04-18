@@ -16,8 +16,8 @@ function ProfileContainer() {
 
       try {
         const url = currentUser.role === 'AUTHOR' 
-          ? `http://localhost:3000/author-api/articles/${currentUser._id}`
-          : `http://localhost:3000/user-api/articles`; // Fallback for others if needed
+          ? `${import.meta.env.VITE_API_BASE_URL}/author-api/articles/${currentUser._id}`
+          : `${import.meta.env.VITE_API_BASE_URL}/user-api/articles`; // Fallback for others if needed
 
         const res = await axios.get(url, { withCredentials: true })
         const articles = res.data.payload || []
