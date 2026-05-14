@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import { useAuth } from "../stores/authStore";
-import axios from "axios";
+import api from "../api/axios";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
@@ -26,10 +26,7 @@ function ArticleById() {
   useEffect(() => {
     async function fetchArticle() {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/common-api/articles/${id}`,
-          { withCredentials: true }
-        );
+        const res = await api.get(`/common-api/articles/${id}`);
         setArticle(res.data.payload);
       } catch (err) {
         // console.log(err);
@@ -45,14 +42,13 @@ function ArticleById() {
   const onAddComment = async (data) => {
     setCommentLoading(true);
     try {
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/user-api/articles`,
+      const res = await api.put(
+        `/user-api/articles`,
         {
           articleId: id,
           user: currentUser._id,
           comment: data.comment,
-        },
-        { withCredentials: true }
+        }
       );
       // Update article with new comments
       setArticle(res.data.payload);

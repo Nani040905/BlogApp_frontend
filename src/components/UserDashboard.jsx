@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../stores/authStore";
-import axios from "axios";
+import api from "../api/axios";
 import { toast } from "react-hot-toast";
 
 function UserDashboard() {
@@ -21,10 +21,7 @@ function UserDashboard() {
 
       try {
 
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/user-api/articles`,
-          { withCredentials: true }
-        );
+        const res = await api.get(`/user-api/articles`);
 
         setArticles(res.data.payload);
 

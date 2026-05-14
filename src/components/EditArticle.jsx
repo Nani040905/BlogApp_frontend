@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router";
 import { useAuth } from "../stores/authStore";
-import axios from "axios";
+import api from "../api/axios";
 import { toast } from "react-hot-toast";
 import { errorClass, loadingClass } from "../styles/common.js";
 
@@ -25,10 +25,7 @@ export default function EditArticle() {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/common-api/articles/${id}`,
-          { withCredentials: true }
-        );
+        const res = await api.get(`/common-api/articles/${id}`);
         const article = res.data.payload;
         
         // Populate form fields
@@ -57,11 +54,7 @@ export default function EditArticle() {
         author: currentUser._id 
       };
 
-      await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/author-api/articles`,
-        updateObj,
-        { withCredentials: true }
-      );
+      await api.put(`/author-api/articles`, updateObj);
 
       toast.success("Article updated successfully!");
       navigate(`/article/${id}`);

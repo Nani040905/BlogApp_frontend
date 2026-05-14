@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink,useNavigate } from "react-router";
-import axios from 'axios'
+import api from '../api/axios'
 import {errorClass, loadingClass} from '../styles/common.js'
 
 
@@ -29,7 +29,7 @@ export default function Register() {
     try {
       if (role === "USER"){
         // make request to user-api
-        let resObj = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user-api/users`,formData)
+        let resObj = await api.post(`/user-api/users`,formData)
         let res = resObj.data;
         navigate('/login')
       }
@@ -37,7 +37,7 @@ export default function Register() {
         // make request to author-api
         let {role,...userObj} = newUser;
         // make request to user-api
-        let resObj = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/author-api/users`,formData)
+        let resObj = await api.post(`/author-api/users`,formData)
         let res = resObj.data;
         navigate('/login')
       }

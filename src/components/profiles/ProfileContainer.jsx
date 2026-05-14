@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../stores/authStore'
-import axios from 'axios'
+import api from '../../api/axios'
 
 function ProfileContainer() {
   const currentUser = useAuth((state) => state.currentUser)
@@ -16,10 +16,10 @@ function ProfileContainer() {
 
       try {
         const url = currentUser.role === 'AUTHOR' 
-          ? `${import.meta.env.VITE_API_BASE_URL}/author-api/articles/${currentUser._id}`
-          : `${import.meta.env.VITE_API_BASE_URL}/user-api/articles`; // Fallback for others if needed
+          ? `/author-api/articles/${currentUser._id}`
+          : `/user-api/articles`; // Fallback for others if needed
 
-        const res = await axios.get(url, { withCredentials: true })
+        const res = await api.get(url)
         const articles = res.data.payload || []
         
         const active = articles.filter(a => a.isArticleActive).length
