@@ -80,6 +80,14 @@ export const useAuth = create((set)=>({
             });
       }
     },
+    resetAuth: () => {
+      set({
+        currentUser: null,
+        isAuthenticated: false,
+        loading: false,
+        error: null
+      });
+    }
 }));
 
 
