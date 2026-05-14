@@ -81,7 +81,14 @@ export default function Register() {
   }, [preview]);
     
   if (loading === true){
-    return <p className={loadingClass}></p>
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#0066cc]/20 border-t-[#0066cc] rounded-full animate-spin"></div>
+          <p className={loadingClass}>Registering your account...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

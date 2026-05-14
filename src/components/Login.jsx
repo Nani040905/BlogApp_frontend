@@ -9,10 +9,22 @@ export default function Login() {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
   const login = useAuth((state)=>state.login)
+  const loading = useAuth((state)=>state.loading)
   const isAuthenticated = useAuth(state=>state.isAuthenticated)
   const currentUser = useAuth(state=>state.currentUser)
   const error = useAuth(state=>state.error)
   const navigate = useNavigate()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#0066cc]/20 border-t-[#0066cc] rounded-full animate-spin"></div>
+          <p className="text-[#0066cc]/60 text-sm animate-pulse text-center">Logging you in...</p>
+        </div>
+      </div>
+    );
+  }
 
 
   const onSubmit = async (userCredObj) => {
