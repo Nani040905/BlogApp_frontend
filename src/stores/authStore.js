@@ -12,24 +12,38 @@ export const useAuth = create((set)=>({
             set({loading:true,error:null})
             //make api call
             let res = await api.get(`/common-api/check-auth`)
-            res=res.data
-            // console.log(res)
-            set({
-                loading:false,
-                isAuthenticated:true,
-                currentUser:res.payload,
-                error:null
-            });
+            const data = res.data
+            
+            if (data.isAuthenticated) {
+              set({
+                  loading:false,
+                  isAuthenticated:true,
+                  currentUser:data.payload,
+                  error:null
+              });
+            } else {
+              set({
+                  loading:false,
+                  isAuthenticated:false,
+                  currentUser:null,
+                  error:null
+              });
+            }
+
 
           } catch (err) {
-            console.log(err)
+            // Silently handle 401 as it just means the user is not logged in
+            if (err.response?.status !== 401) {
+              console.error("Auth verification failed:", err);
+            }
             set({
                 loading:false,
                 isAuthenticated:false,
                 currentUser:null,
-                error:err.response?.data?.error
+                error: err.response?.status === 401 ? null : err.response?.data?.error
             })
       }
+
     },
     login : async (userCredWithRole) => {
         const {role, ...userCredObj} = userCredWithRole;

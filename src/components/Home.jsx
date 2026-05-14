@@ -1,43 +1,139 @@
-import React from 'react'
-import { NavLink } from 'react-router'
+import React, { useEffect, useState } from 'react'
+import { NavLink, useNavigate } from 'react-router'
+import api from '../api/axios'
+import { useAuth } from '../stores/authStore'
 
 function Home() {
+  const [articles, setArticles] = useState([])
+  const [loading, setLoading] = useState(false)
+  const { isAuthenticated, currentUser } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    async function fetchArticles() {
+      setLoading(true)
+      try {
+        // Fetch public articles from common-api instead of protected user-api
+        const res = await api.get('/common-api/articles')
+        setArticles(res.data.payload.slice(0, 6)) // Show latest 6
+      } catch (err) {
+        console.error("Failed to fetch articles", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchArticles()
+  }, [])
+
+
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-6">
-      <div className="max-w-4xl w-full text-center space-y-8 mt-[-10vh]">
-        <div className="inline-block animate-bounce">
-          <span className="bg-blue-100 text-blue-800 text-xs font-bold px-4 py-1.5 rounded-full shadow-sm border border-blue-200 tracking-wider uppercase">
-            Platform 2.0 Live
-          </span>
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-20 sm:py-32">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-primary/10 rounded-full blur-3xl"></div>
         </div>
-        <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight leading-tight">
-          Share your voice with <br/>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-            the world
-          </span>
-        </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-          Create, read, and share engaging stories on our aesthetically stunning, fully modern platform. Join a growing community of readers and writers today.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-          <NavLink to="/login" className="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 font-bold rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all">
-            Explore Blogs
-          </NavLink>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-8 animate-fade-in">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
+            Platform 2.0 Live
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6 animate-fade-in">
+            Share your voice with <br/>
+            <span className="text-primary">the world</span>
+          </h1>
+          
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            Create, read, and share engaging stories on our modern platform. Join a growing community of readers and writers today.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            {isAuthenticated ? (
+              <NavLink 
+                to={currentUser.role === 'USER' ? "/user-dashboard" : currentUser.role === 'AUTHOR' ? "/author-dashboard" : "/admin-dashboard"} 
+                className="btn-primary w-full sm:w-auto px-10 py-4 text-lg"
+              >
+                Go to Dashboard
+              </NavLink>
+            ) : (
+              <>
+                <NavLink to="/register" className="btn-primary w-full sm:w-auto px-10 py-4 text-lg">
+                  Get Started
+                </NavLink>
+                <NavLink to="/login" className="btn-secondary w-full sm:w-auto px-10 py-4 text-lg">
+                  Explore Stories
+                </NavLink>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Articles Grid */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div className="flex items-center justify-between mb-10">
+          <h2 className="text-2xl font-bold text-slate-900">Featured Stories</h2>
+          <NavLink to={isAuthenticated ? "/user-dashboard" : "/login"} className="text-primary font-semibold hover:underline">View all</NavLink>
         </div>
         
-        {/* Placeholder skeleton illustration for aesthetic balance */}
-        <div className="pt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto opacity-60">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex flex-col gap-3 p-4 bg-white/50 backdrop-blur-sm shadow-sm rounded-xl border border-white">
-               <div className="h-24 bg-gray-200/60 rounded-lg animate-pulse"></div>
-               <div className="h-4 w-3/4 bg-gray-200/60 rounded animate-pulse"></div>
-               <div className="h-3 w-1/2 bg-gray-200/60 rounded animate-pulse"></div>
-            </div>
-          ))}
-        </div>
-      </div>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="card animate-pulse h-80 bg-slate-50"></div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {articles.length > 0 ? (
+              articles.map((article, i) => (
+                <NavLink 
+                  to={isAuthenticated ? `/article/${article._id}` : "/login"} 
+                  key={article._id} 
+                  className="card group cursor-pointer animate-fade-in" 
+                  style={{ animationDelay: `${0.3 + i * 0.1}s` }}
+                >
+                  <div className="space-y-4">
+                    <div className="flex gap-2">
+                      <span className="text-[10px] font-bold text-primary uppercase tracking-widest">{article.category || 'Story'}</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">•</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                        {new Date(article.updatedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-primary transition-colors line-clamp-2">
+                      {article.title}
+                    </h3>
+                    <p className="text-slate-600 line-clamp-3 text-sm leading-relaxed">
+                      {article.content}
+                    </p>
+                    <div className="pt-4 flex items-center gap-3 border-t border-slate-50">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                        {article.author?.firstName?.[0] || 'A'}
+                      </div>
+                      <span className="text-sm font-bold text-slate-700">
+                        {article.author?.firstName} {article.author?.lastName}
+                      </span>
+                    </div>
+                  </div>
+                </NavLink>
+              ))
+            ) : (
+              <div className="col-span-full py-20 text-center card border-dashed text-slate-400 font-medium">
+                No articles found. Start the conversation!
+              </div>
+            )}
+          </div>
+        )}
+      </section>
     </div>
   )
 }
 
 export default Home
+

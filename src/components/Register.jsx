@@ -1,181 +1,210 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { NavLink,useNavigate } from "react-router";
-import api from '../api/axios'
-import {errorClass, loadingClass} from '../styles/common.js'
-
+import { NavLink, useNavigate } from "react-router";
+import api from '../api/axios';
+import toast from 'react-hot-toast';
+import { useAuth } from '../stores/authStore';
 
 export default function Register() {
-
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const [loading,setLoading] = useState(false);
-  const [error,setError] = useState(null);  
-  const navigate = useNavigate()
-  const [preview, setPreview] = useState(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const [preview, setPreview] = useState(null);
+  const { isAuthenticated, currentUser } = useAuth();
+
+  // If already authenticated, redirect to dashboard immediately
+  useEffect(() => {
+    if (isAuthenticated && currentUser) {
+      const dashboardPath = currentUser.role === 'USER' ? '/user-dashboard' 
+                         : currentUser.role === 'AUTHOR' ? '/author-dashboard' 
+                         : '/admin-dashboard';
+      navigate(dashboardPath, { replace: true });
+    }
+  }, [isAuthenticated, currentUser, navigate]);
 
   const onSubmit = async (newUser) => {
     setLoading(true);
-		// Create form data object
     const formData = new FormData();
-    //get user object
     let { role, profileImageUrl, ...userObj } = newUser;
-		
-    //add all fields except profilePic to FormData object
+
     Object.keys(userObj).forEach((key) => {
-    	formData.append(key, userObj[key]);
-  	});
-    // add profilePic to Formdata object
-    formData.append("profileImageUrl", profileImageUrl[0]);
+      formData.append(key, userObj[key]);
+    });
+    
+    if (profileImageUrl && profileImageUrl[0]) {
+      formData.append("profileImageUrl", profileImageUrl[0]);
+    }
+
     try {
-      if (role === "USER"){
-        // make request to user-api
-        let resObj = await api.post(`/user-api/users`,formData)
-        let res = resObj.data;
-        navigate('/login')
-      }
-      if (role === "AUTHOR"){
-        // make request to author-api
-        let {role,...userObj} = newUser;
-        // make request to user-api
-        let resObj = await api.post(`/author-api/users`,formData)
-        let res = resObj.data;
-        navigate('/login')
+      if (role === "USER") {
+        await api.post(`/user-api/users`, formData);
+        toast.success("Account created! You can now login.");
+        navigate('/login');
+      } else if (role === "AUTHOR") {
+        await api.post(`/author-api/users`, formData);
+        toast.success("Author account created! You can now login.");
+        navigate('/login');
       }
     } catch (err) {
-			// console.log(err)
-      setError(err.response?.data?.error || "Registration failed")
+      setError(err.response?.data?.error || "Registration failed");
+      toast.error(err.response?.data?.error || "Registration failed");
+    } finally {
+      setLoading(false);
     }
-    finally{
-      setLoading(false)
-    }
-
   };
 
-  const onSelectImage =(e) => {
-    //get image file
+  const onSelectImage = (e) => {
     const file = e.target.files[0];
-    // validation for image format
     if (file) {
       if (!["image/jpeg", "image/png"].includes(file.type)) {
-        setError("Only JPG or PNG allowed");
+        toast.error("Only JPG or PNG allowed");
         return;
       }
-      //validation for file size
       if (file.size > 2 * 1024 * 1024) {
-        setError("File size must be less than 2MB");
+        toast.error("File size must be less than 2MB");
         return;
       }
-      //Converts file → temporary browser URL(create preview URL)
       const previewUrl = URL.createObjectURL(file);
       setPreview(previewUrl);
-      setError(null);
     }
-  }
+  };
 
-	useEffect(() => {
+  useEffect(() => {
     return () => {
-      if (preview) {
-        URL.revokeObjectURL(preview);
-      }
+      if (preview) URL.revokeObjectURL(preview);
     };
   }, [preview]);
-    
-  if (loading === true){
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#0066cc]/20 border-t-[#0066cc] rounded-full animate-spin"></div>
-          <p className={loadingClass}>Registering your account...</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
-    <div>
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 select-none">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-background">
+      <div className="max-w-2xl mx-auto animate-fade-in">
+        <div className="text-center mb-10">
+          <NavLink to="/" className="inline-block mb-6">
+            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-primary/20">
+              B
+            </div>
+          </NavLink>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Create an Account</h1>
+          <p className="text-slate-500 mt-2">Join our community of writers and readers</p>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-white shadow-lg rounded-lg p-8 w-102">
-          <h2 className="text-2xl font-bold mb-6 text-center"> Register </h2>
-          <div className="mb-4">
-            {
-              error ? <p className={errorClass}>{error}</p>:<p></p>
-            }
-          </div>
-
-          {/* First Name */}
-          <div className="mb-4">
-            <label className="block mb-1 font-medium"> First Name </label>
-            <input type="text" className="w-full border rounded p-2" {...register("firstName", { required:true, minLength:2})} />
-            { errors?.firstName?.type=="required" && <p className="text-red-500 text-sm mt-1">First name is required</p> }
-            {errors?.firstName?.type == "minLength" && <p className="text-red-500 text-sm mt-1">First name must be at least 2 characters</p>}
-          </div>
-
-          {/* Last Name */}
-          <div className="mb-4">
-            <label className="block mb-1 font-medium"> Last Name </label>
-            <input type="text" className="w-full border rounded p-2" {...register("lastName")}/>
-          </div>
-
-          {/* Email */}
-          <div className="mb-4">
-            <label className="block mb-1 font-medium"> Email </label>
-            <input type="text" className="w-full border rounded p-2" {...register("email", { required:true, pattern:/^[^\s@]+@[^\s@]+\.[^\s@]+$/})} />
-            { errors?.email?.type=="required" && <p className="text-red-500 text-sm mt-1">Email is required</p> }
-            { errors?.email?.type=="pattern" && <p className="text-red-500 text-sm mt-1">Invalid email address</p> }
-          </div>
-
-          {/* Password */}
-          <div className="mb-4">
-            <label className="block mb-1 font-medium"> Password </label>
-            <input type="password" className="w-full border rounded p-2" {...register("password", { required:true, minLength:6 })} />
-            {errors?.password?.type =="required" && <p className="text-red-500 text-sm mt-1"> Password is required </p> }
-            {errors?.password?.type =="minLength" && <p className="text-red-500 text-sm mt-1"> Password must be at least 6 characters </p> }
-          </div>
-          {/* Profile Picture */}
-          <div className="mb-4">
-            <label className=" block mb-1 font-medium"> Profile Picture </label>
-
-            <div className=" gap-2">
-
-              {/* Image URL 
-              <input type="url" placeholder="Enter image URL" className="w-3/4 border rounded p-2" {...register("profileImageUrl")} /> */}
-
-              {/* Upload Image */}
-              <input type="file" accept="image/png, image/jpeg"  className="w-full border rounded p-2 cursor-pointer" {...register("profileImageUrl")} onChange={onSelectImage}/>
-              {preview && (
-                <div className="mt-3 flex justify-center">
-                <img
-                    src={preview}
-                    alt="Preview"
-                    className="w-24 h-24 object-cover rounded-full border"
+        <div className="card">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* First Name */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">First Name</label>
+                <input
+                  type="text"
+                  {...register("firstName", { required: "First name is required", minLength: 2 })}
+                  className={`input-field ${errors.firstName ? 'border-red-500' : ''}`}
+                  placeholder="John"
                 />
+                {errors.firstName && <p className="text-red-500 text-xs mt-1 font-medium">{errors.firstName.message}</p>}
+              </div>
+
+              {/* Last Name */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Last Name</label>
+                <input
+                  type="text"
+                  {...register("lastName")}
+                  className="input-field"
+                  placeholder="Doe"
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
+              <input
+                type="email"
+                {...register("email", { required: "Email is required", pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email" } })}
+                className={`input-field ${errors.email ? 'border-red-500' : ''}`}
+                placeholder="john@example.com"
+              />
+              {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{errors.email.message}</p>}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
+              <input
+                type="password"
+                {...register("password", { required: "Password is required", minLength: { value: 6, message: "At least 6 characters" } })}
+                className={`input-field ${errors.password ? 'border-red-500' : ''}`}
+                placeholder="••••••••"
+              />
+              {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.password.message}</p>}
+            </div>
+
+            {/* Profile Picture */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Profile Picture</label>
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    accept="image/png, image/jpeg"
+                    className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                    {...register("profileImageUrl")}
+                    onChange={onSelectImage}
+                  />
                 </div>
-            )}
-            </div>
-          </div>
+                {preview ? (
+                  <img src={preview} alt="Preview" className="w-12 h-12 rounded-full object-cover border-2 border-primary/20" />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
 
-          {/* Role */}
-          <div className="mb-6">
-            <label className="block mb-2 font-medium"> Role </label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2">
-                <input type="radio" value="USER" {...register("role", { required:true })} />
-                User
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" value="AUTHOR" {...register("role",{ required:true })} />
-                Author
-              </label>
+                  </div>
+                )}
+              </div>
             </div>
-            {errors?.role?.type=="required" && <p className="text-red-500 text-sm mt-1"> Role is required </p>}
-          </div>
 
-          <button type="submit" className="w-full bg-blue-600 mb-4 text-white p-2 rounded hover:bg-blue-700 hover:cursor-pointer" > Register </button>
-          <div className="">
-            <p>Already have an account? <NavLink to="/login" className="text-blue-400">Login</NavLink></p>
+            {/* Role */}
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <label className="block text-sm font-semibold text-slate-700 mb-3">Join as a</label>
+              <div className="flex gap-6">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input type="radio" value="USER" {...register("role", { required: "Role is required" })} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
+                  <span className="text-sm font-medium text-slate-600 group-hover:text-primary transition-colors">Reader</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input type="radio" value="AUTHOR" {...register("role", { required: "Role is required" })} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
+                  <span className="text-sm font-medium text-slate-600 group-hover:text-primary transition-colors">Writer</span>
+                </label>
+              </div>
+              {errors.role && <p className="text-red-500 text-xs mt-2 font-medium">{errors.role.message}</p>}
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full py-4 text-lg flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Creating Account...
+                </>
+              ) : 'Create Account'}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-slate-600">
+              Already have an account?{' '}
+              <NavLink to="/login" className="font-bold text-primary hover:underline">
+                Sign in instead
+              </NavLink>
+            </p>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

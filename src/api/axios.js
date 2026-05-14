@@ -15,13 +15,13 @@ api.interceptors.response.use(
       const resetAuth = useAuth.getState().resetAuth;
       resetAuth();
       
-      // Optionally redirect to login if not already there
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
-      }
+      // We DO NOT redirect to login here anymore, 
+      // because it causes loops on public pages like Home.
+      // ProtectedRoute component will handle redirects for private routes.
     }
     return Promise.reject(error);
   }
 );
+
 
 export default api;
