@@ -82,7 +82,7 @@ function Header() {
                   to="/register"
                   className="btn-primary py-2 px-5 text-sm"
                 >
-                  Get Started
+                  Sign up
                 </NavLink>
               </div>
             )}

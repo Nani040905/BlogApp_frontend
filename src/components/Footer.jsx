@@ -17,8 +17,8 @@ function Footer() {
           
           <div className="flex gap-8 text-sm font-medium text-slate-500">
             <NavLink to="/" className="hover:text-primary transition-colors">Home</NavLink>
-            <NavLink to="/login" className="hover:text-primary transition-colors">Explore</NavLink>
-            <NavLink to="/register" className="hover:text-primary transition-colors">Write</NavLink>
+            <NavLink to="/login" className="hover:text-primary transition-colors">Browse</NavLink>
+            <NavLink to="/register" className="hover:text-primary transition-colors">Start writing</NavLink>
           </div>
           
           <p className="text-sm text-slate-400">

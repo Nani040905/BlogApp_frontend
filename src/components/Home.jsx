@@ -36,21 +36,17 @@ function Home() {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-8 animate-fade-in">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            Platform 2.0 Live
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold tracking-wider uppercase mb-8 animate-fade-in">
+            Now open for everyone
           </div>
           
           <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6 animate-fade-in">
-            Share your voice with <br/>
-            <span className="text-primary">the world</span>
+            A simple place to <br/>
+            <span className="text-primary">write and read</span>
           </h1>
           
           <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            Create, read, and share engaging stories on our modern platform. Join a growing community of readers and writers today.
+            This is where you can share your thoughts and find interesting things to read. We kept it clean and easy to use, so you can focus on the words.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
@@ -59,15 +55,15 @@ function Home() {
                 to={currentUser.role === 'USER' ? "/user-dashboard" : currentUser.role === 'AUTHOR' ? "/author-dashboard" : "/admin-dashboard"} 
                 className="btn-primary w-full sm:w-auto px-10 py-4 text-lg"
               >
-                Go to Dashboard
+                Go to my dashboard
               </NavLink>
             ) : (
               <>
                 <NavLink to="/register" className="btn-primary w-full sm:w-auto px-10 py-4 text-lg">
-                  Get Started
+                  Start writing
                 </NavLink>
                 <NavLink to="/login" className="btn-secondary w-full sm:w-auto px-10 py-4 text-lg">
-                  Explore Stories
+                  Browse stories
                 </NavLink>
               </>
             )}
@@ -78,7 +74,7 @@ function Home() {
       {/* Articles Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div className="flex items-center justify-between mb-10">
-          <h2 className="text-2xl font-bold text-slate-900">Featured Stories</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Recent stories</h2>
           <NavLink to={isAuthenticated ? "/user-dashboard" : "/login"} className="text-primary font-semibold hover:underline">View all</NavLink>
         </div>
         
@@ -125,7 +121,7 @@ function Home() {
               ))
             ) : (
               <div className="col-span-full py-20 text-center card border-dashed text-slate-400 font-medium">
-                No articles found. Start the conversation!
+                Nothing posted here yet. Maybe you should be the first.
               </div>
             )}
           </div>
